@@ -1,121 +1,336 @@
-# Create user_stories.md with full content
-@'
-# Patient Appointment Portal — User Stories
+# User Stories — Patient Appointment Portal
 
-> **Conventions**
-> - Format: *As a `<role>`, I want `<capability>` so that `<benefit>`*.
-> - **Priority**: P1 (must), P2 (should), P3 (nice).
-> - **AC** = Acceptance Criteria (Given/When/Then).
+## User Story Template
+```markdown
+**Title:**
+_As a [user role], I want [feature/goal], so that [reason]._
 
-## Roles
-- **Admin** – manages users, roles, clinic settings.
-- **Doctor** – manages availability and appointments.
-- **Patient** – books and manages own appointments.
+**Acceptance Criteria:**
+1. [Criteria 1]
+2. [Criteria 2]
+3. [Criteria 3]
 
----
+**Priority:** [High/Medium/Low]
+**Story Points:** [Estimated Effort in Points]
 
-## Epic A: Admin Management
-
-### A1. Create & manage users (P1)
-**As an** Admin, **I want** to create, edit, deactivate users and assign roles **so that** access is controlled.  
-**AC**
-- Given I’m an Admin, when I create a user with valid data, then the user appears with the selected role.
-- Given a user is active, when I deactivate them, then they cannot sign in.
-- Given a user has roles, when I update roles, then permissions update immediately.
-
-### A2. Role-based access control (P1)
-**As an** Admin, **I want** predefined roles (Admin/Doctor/Patient) with scoped permissions **so that** least privilege is enforced.  
-**AC**
-- Given a Patient, when accessing admin screens, then access is denied.
-- Given a Doctor, when viewing own schedule, then access is granted; editing other doctors’ schedules is denied.
-
-### A3. Clinic settings (P2)
-**As an** Admin, **I want** to define clinic hours, appointment slot length, and max daily bookings **so that** scheduling follows rules.  
-**AC**
-- Given slot length = 20 min, when patients book, then slots follow 20-min grid within clinic hours.
-- Given max daily bookings set, when limit is reached, then further bookings for that doctor/day are blocked.
-
-### A4. Audit log (P2)
-**As an** Admin, **I want** an audit trail for critical actions **so that** changes are traceable.  
-**AC**
-- When a user is created/role changed/appointment deleted, then an audit record with actor, timestamp, and diff is stored.
-
-### A5. Bulk import doctors (P3)
-**As an** Admin, **I want** to upload a CSV of doctors **so that** I can onboard quickly.  
-**AC**
-- Given a valid CSV, when uploaded, then doctors are created; invalid rows are reported with reasons.
+**Notes:**
+- [Additional information or edge cases]
+```
 
 ---
 
-## Epic B: Doctor Scheduling & Care
+## Admin User Stories
 
-### B1. Set availability (P1)
-**As a** Doctor, **I want** to define recurring/one-off availability **so that** patients can book only free times.  
-**AC**
-- Given I add a weekly rule (Mon 09:00–12:00), then slots appear for those periods.
-- Given I add an exception (vacation day), then no slots appear on that date.
+### A1 — Admin logs in to manage the platform
+```markdown
+**Title:** Admin logs in to manage the platform
 
-### B2. View my appointments (P1)
-**As a** Doctor, **I want** a calendar of my appointments **so that** I can plan my day.  
-**AC**
-- Given I’m signed in as a Doctor, when I open “My Schedule,” then I see upcoming appointments with patient name, reason, and status.
+_As an **Admin**, I want to log into the portal with my username and password, so that I can manage the platform securely._
 
-### B3. Approve/decline appointments (P1)
-**As a** Doctor, **I want** to approve or decline pending bookings **so that** I control my schedule.  
-**AC**
-- Given an appointment is pending, when I approve, then status becomes “Confirmed” and the patient is notified.
-- Given I decline, then the slot is released and the patient is notified with the reason.
+**Acceptance Criteria:**
+1. Given valid credentials, when I submit the login form, then I’m authenticated and redirected to the admin dashboard.
+2. Given invalid credentials, when I submit the form, then I see a clear error and remain on the login page.
+3. Given RBAC, when logged in as Admin, then I can access admin-only pages; non-admins are denied.
 
-### B4. Add visit notes/prescription (P2)
-**As a** Doctor, **I want** to record visit notes and prescriptions **so that** medical records are complete.  
-**AC**
-- Given a confirmed appointment, when I add notes and prescription items, then they are saved to the patient record and visible on next visits.
+**Priority:** High
+**Story Points:** 3
 
-### B5. Block time (P2)
-**As a** Doctor, **I want** to block time for meetings/emergencies **so that** no bookings occur in that period.  
-**AC**
-- When I create a block from 14:00–15:00, then overlapping patient bookings are prevented.
+**Notes:**
+- Consider account lockout after N failed attempts; “remember me” optional.
+```
+
+### A2 — Admin logs out to protect access
+```markdown
+**Title:** Admin logs out to protect access
+
+_As an **Admin**, I want to log out of the portal, so that unauthorized users cannot access the system from my session._
+
+**Acceptance Criteria:**
+1. Clicking Logout invalidates the session and redirects to the login page.
+2. Using the back button does not expose protected pages.
+3. Session cookie is removed/expired.
+
+**Priority:** High
+**Story Points:** 1
+
+**Notes:**
+- Idle timeout policy (optional).
+```
+
+### A3 — Admin adds a doctor profile
+```markdown
+**Title:** Admin adds a doctor profile
+
+_As an **Admin**, I want to add doctors to the portal, so that patients can book appointments with them._
+
+**Acceptance Criteria:**
+1. Given valid doctor data (name, specialization, contact), when I save, then a doctor profile is created and searchable.
+2. Required fields are validated; errors shown inline.
+3. An audit record is created for the action.
+
+**Priority:** High
+**Story Points:** 3
+
+**Notes:**
+- Optional: avatar upload, locations.
+```
+
+### A4 — Admin deletes a doctor profile
+```markdown
+**Title:** Admin deletes a doctor profile
+
+_As an **Admin**, I want to delete a doctor’s profile, so that I can remove inactive staff from the portal._
+
+**Acceptance Criteria:**
+1. Given a doctor profile, when I choose Delete and confirm, then the profile is removed or soft-deleted.
+2. If future appointments exist, I’m warned and deletion is blocked or requires reassignment.
+3. Audit record captures who deleted and when.
+
+**Priority:** Medium
+**Story Points:** 2
+
+**Notes:**
+- Prefer soft delete to preserve history.
+```
+
+### A5 — Admin runs MySQL stored procedure for monthly appointment stats
+```markdown
+**Title:** Admin runs MySQL stored procedure for monthly appointment stats
+
+_As an **Admin**, I want to run a stored procedure in the MySQL CLI to get the number of appointments per month, so that I can track usage statistics._
+
+**Acceptance Criteria:**
+1. Given DB access, when I execute the stored procedure, then it returns counts grouped by month (YYYY-MM, total).
+2. When no data exists for a month, then it returns 0 or omits the month as per spec.
+3. Procedure is documented with name, params, and sample output.
+
+**Priority:** Medium
+**Story Points:** 2
+
+**Notes:**
+- Export results to CSV (optional).
+```
 
 ---
 
-## Epic C: Patient Booking & Self-Service
+## Patient User Stories
 
-### C1. Register & sign in (P1)
-**As a** Patient, **I want** to register and sign in securely **so that** I can manage my appointments.  
-**AC**
-- Given valid registration data, when I submit, then my account is created and I receive a verification email.
-- Given verified email, when I sign in with correct credentials, then access is granted.
+### P1 — Patient can browse doctors without logging in
+```markdown
+**Title:** Patient can browse doctors without logging in
 
-### C2. Search doctor & available slots (P1)
-**As a** Patient, **I want** to search doctors by specialty/name and see available times **so that** I can choose a suitable slot.  
-**AC**
-- Given a specialty filter, when I search, then I see matching doctors and their next available slots.
+_As a **Patient**, I want to view a list of doctors without logging in, so that I can explore options before registering._
 
-### C3. Book an appointment (P1)
-**As a** Patient, **I want** to book a free slot and specify reason **so that** my visit is scheduled.  
-**AC**
-- Given a free slot, when I submit booking with reason, then I see “Pending” or “Confirmed” according to the clinic rule, and a notification is sent.
+**Acceptance Criteria:**
+1. When I open the Doctors page, then I see basic profiles (name, specialization) and next available times.
+2. Protected actions (book, view details) prompt me to sign up/login.
+3. Filters by specialization/name work without authentication.
 
-### C4. Reschedule/cancel (P1)
-**As a** Patient, **I want** to reschedule or cancel within policy **so that** I can adjust plans.  
-**AC**
-- Given a confirmed appointment and reschedule ≥24h before, when I pick a new free slot, then the old slot is released and the new one is confirmed/pending.
-- Given a cancellation policy, when I cancel inside the restricted window, then I see a warning and (if allowed) proceed with acknowledgment.
+**Priority:** High
+**Story Points:** 2
 
-### C5. Notifications (P2)
-**As a** Patient, **I want** email/SMS reminders **so that** I don’t miss visits.  
-**AC**
-- When an appointment is created/changed/cancelled, then I receive a notification.
-- When the visit is in 24h, then I receive a reminder (configurable).
+**Notes:**
+- Hide contact info if policy requires login.
+```
 
-### C6. View history & prescriptions (P2)
-**As a** Patient, **I want** to view my past appointments and prescriptions **so that** I can track treatment.  
-**AC**
-- Given I open “My History,” then I see previous visits with notes and downloadable prescriptions.
+### P2 — Patient signs up with email and password
+```markdown
+**Title:** Patient signs up with email and password
+
+_As a **Patient**, I want to sign up using my email and password, so that I can book appointments._
+
+**Acceptance Criteria:**
+1. Given valid data, when I register, then an account is created and I receive verification (email).
+2. Weak passwords are rejected per policy.
+3. After verification, I can log in successfully.
+
+**Priority:** High
+**Story Points:** 3
+
+**Notes:**
+- Consider captcha / rate limiting.
+```
+
+### P3 — Patient logs in to manage bookings
+```markdown
+**Title:** Patient logs in to manage bookings
+
+_As a **Patient**, I want to log into the portal, so that I can manage my bookings._
+
+**Acceptance Criteria:**
+1. With correct credentials, I’m redirected to my dashboard.
+2. With incorrect credentials, I see an error and remain on login.
+3. Only Patient-scoped features are accessible.
+
+**Priority:** High
+**Story Points:** 2
+
+**Notes:**
+- Support “remember me” (optional).
+```
+
+### P4 — Patient logs out to secure account
+```markdown
+**Title:** Patient logs out to secure account
+
+_As a **Patient**, I want to log out of the portal, so that my account stays secure on shared devices._
+
+**Acceptance Criteria:**
+1. Clicking Logout invalidates my session and redirects me to login/home.
+2. Back button does not reveal protected pages.
+3. Session cookie cleared.
+
+**Priority:** High
+**Story Points:** 1
+
+**Notes:**
+- Idle timeout policy (optional).
+```
+
+### P5 — Patient books a one-hour appointment
+```markdown
+**Title:** Patient books a one-hour appointment
+
+_As a **Patient**, I want to log in and book an hour-long appointment to consult with a doctor, so that I can receive care._
+
+**Acceptance Criteria:**
+1. Given a free 60-minute slot, when I submit booking with reason, then the appointment is created with status Pending/Confirmed per policy.
+2. Double booking is prevented; I receive a confirmation/notification.
+3. If no 60-minute slot exists, I see alternatives or next availability.
+
+**Priority:** High
+**Story Points:** 5
+
+**Notes:**
+- Slot grid and clinic hours defined by admin settings.
+```
+
+### P6 — Patient views upcoming appointments
+```markdown
+**Title:** Patient views upcoming appointments
+
+_As a **Patient**, I want to view my upcoming appointments, so that I can prepare accordingly._
+
+**Acceptance Criteria:**
+1. My dashboard lists future appointments with date/time, doctor, location/mode, and status.
+2. I can access actions allowed by policy (reschedule/cancel).
+3. Past appointments appear in a separate history section.
+
+**Priority:** Medium
+**Story Points:** 2
+
+**Notes:**
+- Add calendar export (optional).
+```
 
 ---
 
-## NFRs
-Security (RBAC, hashed passwords), Privacy (audit, encryption at rest), Performance (<1s search, <2s booking), Reliability (no double booking), Observability (logs/metrics).
+## Doctor User Stories
 
-'@ | Set-Content -Encoding UTF8 -NoNewline -Pa
+### D1 — Doctor logs in to manage appointments
+```markdown
+**Title:** Doctor logs in to manage appointments
+
+_As a **Doctor**, I want to log into the portal, so that I can manage my appointments._
+
+**Acceptance Criteria:**
+1. With valid credentials, I’m redirected to “My Schedule.”
+2. RBAC allows only doctor-scoped pages.
+3. Invalid credentials show a clear error.
+
+**Priority:** High
+**Story Points:** 2
+
+**Notes:**
+- MFA (optional).
+```
+
+### D2 — Doctor logs out to protect data
+```markdown
+**Title:** Doctor logs out to protect data
+
+_As a **Doctor**, I want to log out of the portal, so that my professional data stays protected._
+
+**Acceptance Criteria:**
+1. Logout invalidates session and redirects to login.
+2. Back navigation doesn’t expose protected pages.
+3. Session cookie removed.
+
+**Priority:** High
+**Story Points:** 1
+
+**Notes:**
+- Idle timeout policy (optional).
+```
+
+### D3 — Doctor views appointment calendar
+```markdown
+**Title:** Doctor views appointment calendar
+
+_As a **Doctor**, I want to view my appointment calendar, so that I can stay organized._
+
+**Acceptance Criteria:**
+1. Calendar shows upcoming appointments with patient name, reason, and status.
+2. Supports day/week/month views; time zone correct.
+3. Updates reflect new bookings/cancellations in near-real-time.
+
+**Priority:** High
+**Story Points:** 3
+
+**Notes:**
+- ICS export (optional).
+```
+
+### D4 — Doctor marks unavailability
+```markdown
+**Title:** Doctor marks unavailability
+
+_As a **Doctor**, I want to mark my unavailability, so that patients can only see and book available slots._
+
+**Acceptance Criteria:**
+1. I can block one-off periods and recurring rules; blocked times are not bookable.
+2. If blocks overlap existing bookings, I’m warned and must reschedule/confirm override.
+3. Patients see only free slots after applying my unavailability.
+
+**Priority:** High
+**Story Points:** 3
+
+**Notes:**
+- Sync with clinic hours settings.
+```
+
+### D5 — Doctor updates profile with specialization and contact
+```markdown
+**Title:** Doctor updates profile with specialization and contact
+
+_As a **Doctor**, I want to update my profile with specialization and contact info, so that patients have up-to-date information._
+
+**Acceptance Criteria:**
+1. I can edit specialization, bio, contact methods; required fields validated.
+2. Changes are reflected immediately in patient search/results.
+3. Audit captures profile updates.
+
+**Priority:** Medium
+**Story Points:** 2
+
+**Notes:**
+- Optional: languages spoken, photo.
+```
+
+### D6 — Doctor views patient details for upcoming appointments
+```markdown
+**Title:** Doctor views patient details for upcoming appointments
+
+_As a **Doctor**, I want to view the patient details for upcoming appointments, so that I can be prepared._
+
+**Acceptance Criteria:**
+1. For each future appointment, I can open a detail view with patient demographics and reason for visit.
+2. Access complies with privacy/RBAC; I cannot see patients not on my schedule.
+3. Audit log records each access to patient details.
+
+**Priority:** Medium
+**Story Points:** 2
+
+**Notes:**
+- Link to past notes/prescriptions (read-only).
+```
