@@ -1,5 +1,7 @@
 package com.project.back_end.models;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
@@ -28,6 +30,29 @@ public class Prescription {
 
     @Size(max = 200, message = "Doctor notes cannot exceed 200 characters")
     private String doctorNotes;
+
+    public Integer getRefillCount() {
+        return refillCount;
+    }
+
+    public void setRefillCount(Integer refillCount) {
+        this.refillCount = refillCount;
+    }
+
+    public String getPharmacyName() {
+        return pharmacyName;
+    }
+
+    public void setPharmacyName(String pharmacyName) {
+        this.pharmacyName = pharmacyName;
+    }
+
+    @Min(0)
+    @Max(10)
+    private Integer refillCount;
+
+    @Size(min = 3, max = 100)
+    private String pharmacyName;
 
     public Prescription() {}
 

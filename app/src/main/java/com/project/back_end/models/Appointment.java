@@ -3,6 +3,7 @@ package com.project.back_end.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,28 @@ public class Appointment {
 
     @NotNull(message = "Status cannot be null")
     private Integer status;   // 0 = Scheduled, 1 = Completed
+
+    @Size(min = 3, max = 200)
+    private String reasonForVisit;
+
+    @Size(max = 300)
+    private String notes;
+
+    public String getReasonForVisit() {
+        return reasonForVisit;
+    }
+
+    public void setReasonForVisit(String reasonForVisit) {
+        this.reasonForVisit = reasonForVisit;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
     public Appointment() {}
 

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class Patient {
 
@@ -31,6 +33,39 @@ public class Patient {
     @NotNull(message = "Address cannot be null")
     @Size(max = 255, message = "Address cannot exceed 255 characters")
     private String address;
+    
+    @Past(message = "Date of birth must be in the past")
+    private LocalDate dateOfBirth;
+
+    public String getEmergencyContact() {
+        return emergencyContact;
+    }
+
+    public void setEmergencyContact(String emergencyContact) {
+        this.emergencyContact = emergencyContact;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getInsuranceProvider() {
+        return insuranceProvider;
+    }
+
+    public void setInsuranceProvider(String insuranceProvider) {
+        this.insuranceProvider = insuranceProvider;
+    }
+
+    @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Emergency contact must be a valid phone number")
+    private String emergencyContact;
+
+    @Size(min = 3, max = 100)
+    private String insuranceProvider;
 
     public Patient() {}
 

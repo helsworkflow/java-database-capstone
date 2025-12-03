@@ -34,6 +34,41 @@ public class Doctor {
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phone;
 
+    @Min(0)
+    @Max(60)
+    private Integer yearsOfExperience;
+
+    public Integer getYearsOfExperience() {
+        return yearsOfExperience;
+    }
+
+    public void setYearsOfExperience(Integer yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
+    }
+
+    public String getClinicAddress() {
+        return clinicAddress;
+    }
+
+    public void setClinicAddress(String clinicAddress) {
+        this.clinicAddress = clinicAddress;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    @Size(max = 255)
+    private String clinicAddress;
+
+    @Min(0)
+    @Max(5)
+    private Double rating;
+
     @ElementCollection
     private List<String> availableTimes;
 
