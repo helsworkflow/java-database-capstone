@@ -1,5 +1,6 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -34,8 +35,9 @@ public class Doctor {
     @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
     private String phone;
 
-    @Min(0)
-    @Max(60)
+    @Min(value = 0, message = "Years of experience cannot be negative")
+    @Max(value = 60, message = "Years of experience seems too high")
+    @JsonProperty("experienceYears")
     private Integer yearsOfExperience;
 
     public Integer getYearsOfExperience() {
@@ -62,14 +64,16 @@ public class Doctor {
         this.rating = rating;
     }
 
-    @Size(max = 255)
+    @Size(max = 255, message = "Clinic address cannot exceed 255 characters")
     private String clinicAddress;
 
-    @Min(0)
-    @Max(5)
+    @Min(value = 0, message = "Rating cannot be negative")
+    @Max(value = 5, message = "Rating cannot be greater than 5")
+    @JsonIgnore
     private Double rating;
 
     @ElementCollection
+    @JsonProperty("availableTimeSlots")
     private List<String> availableTimes;
 
     public Doctor() {}

@@ -1,5 +1,6 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
@@ -26,15 +27,17 @@ public class Appointment {
 
     @NotNull(message = "Appointment time cannot be null")
     @Future(message = "Appointment time must be in the future")
+    @JsonProperty("startTime")
     private LocalDateTime appointmentTime;
 
     @NotNull(message = "Status cannot be null")
+    @JsonProperty("appointmentStatus")
     private Integer status;   // 0 = Scheduled, 1 = Completed
 
-    @Size(min = 3, max = 200)
+    @Size(min = 3, max = 200, message = "Reason for visit must be between 3 and 200 characters")
     private String reasonForVisit;
 
-    @Size(max = 300)
+    @Size(max = 300, message = "Notes cannot exceed 300 characters")
     private String notes;
 
     public String getReasonForVisit() {

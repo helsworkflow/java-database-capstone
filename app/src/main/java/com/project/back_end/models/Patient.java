@@ -1,5 +1,6 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -35,6 +36,7 @@ public class Patient {
     private String address;
     
     @Past(message = "Date of birth must be in the past")
+    @JsonProperty("dob")
     private LocalDate dateOfBirth;
 
     public String getEmergencyContact() {
@@ -64,7 +66,8 @@ public class Patient {
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Emergency contact must be a valid phone number")
     private String emergencyContact;
 
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 100, message = "Insurance provider must be between 3 and 100 characters")
+    @JsonIgnore
     private String insuranceProvider;
 
     public Patient() {}

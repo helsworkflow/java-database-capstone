@@ -9,6 +9,7 @@ public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("adminId")
     private Long id;
 
     @NotNull(message = "username cannot be null")

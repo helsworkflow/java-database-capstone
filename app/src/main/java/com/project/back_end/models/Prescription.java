@@ -1,5 +1,6 @@
 package com.project.back_end.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -47,11 +48,13 @@ public class Prescription {
         this.pharmacyName = pharmacyName;
     }
 
-    @Min(0)
-    @Max(10)
+    @Min(value = 0, message = "Refill count cannot be negative")
+    @Max(value = 10, message = "Refill count cannot be greater than 10")
+    @JsonProperty("refillsRemaining")
     private Integer refillCount;
 
-    @Size(min = 3, max = 100)
+    @Size(min = 3, max = 100, message = "Pharmacy name must be between 3 and 100 characters")
+    @JsonProperty("pharmacy")
     private String pharmacyName;
 
     public Prescription() {}
